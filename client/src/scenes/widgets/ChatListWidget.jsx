@@ -1,15 +1,15 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import ChatFriend from "components/ChatFriend";
-import Friend from "components/Friend";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setChats, setFriends, setSelectedChat } from "state";
+import { setChats, setSelectedChat } from "state";
 import { InputBase } from "@mui/material";
 import { IconButton } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import FlexBetween from "components/FlexBetween";
 import UserImage from "components/UserImage";
+import { getSender } from "Config/ChatLogics";
 
 const ChatListWidget = ({ userId }) => {
   const dispatch = useDispatch();
@@ -19,11 +19,12 @@ const ChatListWidget = ({ userId }) => {
   const primaryDark = palette.primary.dark;
   const main = palette.neutral.main;
   const medium = palette.neutral.medium;
-
+  const user = useSelector((state) => state.user);
   // const [loggedUser, setLoggedUser] = useState();
   const token = useSelector((state) => state.token);
   const chats = useSelector((state) => state.chats);
   const selectedChat = useSelector((state) => state.selectedChat);
+  const [fetchAgain, setFetchAgain] = useState(false);
   // const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
 
   const getChats = async () => {
@@ -42,78 +43,19 @@ const ChatListWidget = ({ userId }) => {
 
   useEffect(() => {
     getChats();
-  }, []);
-
-  // const fetchChats = async () => {
-  //   // console.log(user._id);
-  //   try {
-  //     const config = {
-  //       headers: {
-  //         Authorization: `Bearer ${user.token}`,
-  //       },
-  //     };
-
-  //     const { data } = await axios.get("/api/chat", config);
-  //     setChats(data);
-  //   } catch (error) {
-  //     toast({
-  //       title: "Error Occured!",
-  //       description: "Failed to Load the chats",
-  //       status: "error",
-  //       duration: 5000,
-  //       isClosable: true,
-  //       position: "bottom-left",
-  //     });
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
-  //   fetchChats();
-  //   // eslint-disable-next-line
-  // }, [fetchAgain]);
-
-  // const dispatch = useDispatch();
-  // const { palette } = useTheme();
-
-  // const friends = useSelector((state) => state.user.friends);
-
-  // const getFriends = async () => {
-  //   const response = await fetch(
-  //     `http://localhost:3001/users/${userId}/friends`,
-  //     {
-  //       method: "GET",
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     }
-  //   );
-  //   const data = await response.json();
-  //   dispatch(setFriends({ friends: data }));
-  // };
-
-  // useEffect(() => {
-  //   getFriends();
-  // }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [fetchAgain]);
 
   const [searchResult, setSearchResult] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const handleInputChange = (event) => {
     // Update the searchValue state when the input value changes
-    setSearchValue(event.target.value);
+    setSearchValue(() => event.target.value);
   };
 
   const accessChat = async (userId) => {
-    console.log(userId);
+    // console.log(userId);
 
     try {
-      // const config = {
-      //   headers: {
-      //     "Content-type": "application/json",
-      //     Authorization: `Bearer ${user.token}`,
-      //   },
-      // };
-      // const { data } = await axios.post(`/api/chat`, { userId }, config);
-      // const formData = new FormData();
-      // formData.append("userId", userId);
       const response = await fetch(`http://localhost:3001/chats`, {
         method: "POST",
         headers: {
@@ -123,13 +65,13 @@ const ChatListWidget = ({ userId }) => {
         body: JSON.stringify({ userId: userId }),
       });
       const data = await response.json();
-      console.log("access", data);
-
+      // console.log("access", data);
+      dispatch(setSelectedChat(() => ({ selectedChat: data })));
       if (!chats.find((c) => c._id === selectedChat._id))
         dispatch(setChats({ chats: [selectedChat, ...chats] }));
 
-      dispatch(setSelectedChat({ selectedChat: data }));
-
+      // console.log(selectedChat);
+      // console.log(data);
       // if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
       // setSelectedChat(data);
       // setLoadingChat(false);
@@ -161,7 +103,7 @@ const ChatListWidget = ({ userId }) => {
       const data = await response.json();
       setSearchResult(data);
       setSearchValue("");
-      console.log(data);
+      // console.log(data);
     } catch (error) {
       console.log(error.message);
     }
@@ -199,14 +141,20 @@ const ChatListWidget = ({ userId }) => {
             <FlexBetween key={user._id}>
               <FlexBetween gap="1rem">
                 <UserImage image={user.picturePath} size="55px" />
-                <Box onClick={() => accessChat(user._id)}>
+                <Box
+                  onClick={async () => {
+                    await accessChat(user._id);
+                    setSearchResult(() => []);
+                    setFetchAgain((val) => !val);
+                  }}
+                >
                   <Typography
                     color={main}
                     variant="h5"
                     fontWeight="500"
                     sx={{
                       "&:hover": {
-                        color: palette.primary.light,
+                        color: palette.primary.main,
                         cursor: "pointer",
                       },
                     }}
@@ -221,8 +169,16 @@ const ChatListWidget = ({ userId }) => {
           chats.length !== 0 &&
           chats.map((chat) => (
             <ChatFriend
-              key={chat.users[1]._id}
-              name={`${chat.users[1].firstName} ${chat.users[1].lastName}`}
+              key={chat._id}
+              // name={getSender(user, chat.users)}
+              name={`${getSender(user, chat.users).firstName} ${
+                getSender(user, chat.users).lastName
+              }`}
+              chat={chat}
+              onClick={(chat) => {
+                console.log(chat);
+                dispatch(setSelectedChat({ selectedChat: chat }));
+              }}
               subtitle={
                 chat.latestMessage
                   ? chat.latestMessage.content.length > 50

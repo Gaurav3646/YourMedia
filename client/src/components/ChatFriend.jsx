@@ -6,7 +6,14 @@ import { setFriends } from "state";
 import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 
-const ChatFriend = ({ friendId, name, subtitle, userPicturePath }) => {
+const ChatFriend = ({
+  friendId,
+  name,
+  subtitle,
+  userPicturePath,
+  onClick,
+  chat,
+}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { _id } = useSelector((state) => state.user);
@@ -40,19 +47,14 @@ const ChatFriend = ({ friendId, name, subtitle, userPicturePath }) => {
     <FlexBetween>
       <FlexBetween gap="1rem">
         <UserImage image={userPicturePath} size="55px" />
-        <Box
-        // onClick={() => {
-        //   navigate(`/profile/${friendId}`);
-        //   navigate(0);
-        // }}
-        >
+        <Box onClick={() => onClick(chat)}>
           <Typography
             color={main}
             variant="h5"
             fontWeight="500"
             sx={{
               "&:hover": {
-                color: palette.primary.light,
+                color: palette.primary.main,
                 cursor: "pointer",
               },
             }}

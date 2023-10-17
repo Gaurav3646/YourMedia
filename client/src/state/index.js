@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import io from "socket.io-client";
 
 const initialState = {
   mode: "light",
@@ -8,6 +9,8 @@ const initialState = {
   selectedChat: null,
   notification: null,
   chats: [],
+  messages: [],
+  // socket: null,
 };
 
 export const authSlice = createSlice({
@@ -49,6 +52,17 @@ export const authSlice = createSlice({
     setChats: (state, action) => {
       state.chats = action.payload.chats;
     },
+    setMessage: (state, action) => {
+      state.messages = [action.messages, ...state.payload.messages];
+    },
+    setMessages: (state, action) => {
+      state.messages = [...action.payload.messages];
+    },
+    // initializeSocket: (state, action) => {
+    //   console.log(action.payload);
+    //   state.socket = { ...action.payload.socket };
+    //   console.log("Ho gaya connect-2");
+    // },
   },
 });
 
@@ -58,9 +72,12 @@ export const {
   setLogout,
   setFriends,
   setPosts,
+  setMessage,
   setPost,
   setSelectedChat,
   setNotification,
+  setMessages,
   setChats,
+  // initializeSocket,
 } = authSlice.actions;
 export default authSlice.reducer;

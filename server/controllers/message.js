@@ -7,9 +7,11 @@ import Chat from "../models/Chat.js";
 //@access          Protected
 export const allMessages = async (req, res) => {
   try {
+    console.log(req.params);
     const messages = await Message.find({ chat: req.params.chatId })
-      .populate("sender", "name pic email")
+      .populate("sender", "firstName lastName picturePath email")
       .populate("chat");
+
     res.json(messages);
   } catch (error) {
     res.status(400).json(error.message);
@@ -21,12 +23,12 @@ export const allMessages = async (req, res) => {
 //@access          Protected
 export const sendMessage = async (req, res) => {
   const { content, chatId } = req.body;
-
+  // console.log(chatId);
   if (!content || !chatId) {
     console.log("Invalid data passed into request");
     return res.sendStatus(400);
   }
-
+  console.log(req._id);
   var newMessage = {
     sender: req._id,
     content: content,
@@ -36,17 +38,20 @@ export const sendMessage = async (req, res) => {
   try {
     var message = await Message.create(newMessage);
 
-    message = await message.populate("sender", "name pic").execPopulate();
-    message = await message.populate("chat").execPopulate();
-    message = await User.populate(message, {
-      path: "chat.users",
-      select: "name pic email",
-    });
+    const populatedMessage = await Message.findById(message._id)
+      .populate("sender", "firstName lastName picturePath")
+      .populate("chat")
+      .populate({
+        path: "chat.users",
+        select: "firstName lastName picturePath email",
+      })
+      .exec();
 
-    await Chat.findByIdAndUpdate(req.body.chatId, { latestMessage: message });
+    // Update the latest message in the chat
+    await Chat.findByIdAndUpdate(chatId, { latestMessage: populatedMessage });
 
-    res.json(message);
+    res.json(populatedMessage);
   } catch (error) {
-    res.status(400).json(error.message);
+    res.status(400).json(error);
   }
 };

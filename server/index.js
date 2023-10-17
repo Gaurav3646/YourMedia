@@ -19,6 +19,7 @@ import { verifyToken } from "./middleware/auth.js";
 import User from "./models/User.js";
 import Post from "./models/Post.js";
 import { users, posts } from "./data/index.js";
+import { Server } from "socket.io";
 
 /* CONFIGURATIONS */
 const __filename = fileURLToPath(import.meta.url);
@@ -64,16 +65,81 @@ const DB = process.env.MONGO_URL.replace(
   process.env.DATABASE_PASSWORD
 );
 console.log(DB);
-mongoose
-  .connect(DB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
+(async () => {
+  try {
+    const conn = await mongoose.connect(DB, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
 
-    /* ADD DATA ONE TIME */
-    // User.insertMany(users);
-    // Post.insertMany(posts);
-  })
-  .catch((error) => console.log(`${error} did not connect`));
+    const server = await app.listen(PORT, () => {
+      console.log(`Server running on PORT ${PORT}...`);
+    });
+
+    const io = new Server(server, {
+      pingTimeout: 60000,
+      cors: {
+        origin: "http://localhost:3000",
+        // credentials: true,
+      },
+    });
+    var online = [];
+    io.on("connection", (socket) => {
+      console.log("Connected to socket.io");
+
+      socket.on("setup", (userData) => {
+        console.log(userData._id);
+        socket.join(userData._id);
+        socket.join("abcd");
+        socket.emit("connected", userData._id);
+        // socket.broadcast.emit("online", userData._id);
+      });
+      // socket.on("dissconnect", (id) => {
+      //   console.log("USER DISCONNECTED");
+      //   socket.broadcast.emit("offline", id);
+      // });
+
+      socket.on("join chat", (room) => {
+        socket.join(room);
+        console.log("User Joined Room: " + room);
+      });
+
+      socket.on("online", (id) => {
+        if (!online.includes(id)) {
+          online.push(id);
+          console.log(online);
+          io.to("abcd").emit("online", online);
+        }
+      });
+      socket.on("offline", (id) => {
+        var newOnline = online.filter((userId) => userId !== id);
+        online = newOnline;
+        console.log(online);
+        io.to("abcd").emit("offline", online);
+      });
+
+      socket.on("typing", (room, id) => io.to(room).emit("typing", id));
+      socket.on("stop typing", (room, id) =>
+        io.to(room).emit("stop typing", id)
+      );
+
+      socket.on("new message", (newMessageReceived) => {
+        const chat = newMessageReceived.chat;
+
+        if (!chat || !chat.users) {
+          return console.log("chat.users not defined");
+        }
+
+        chat.users.forEach((user) => {
+          if (user === newMessageReceived.sender._id) return;
+          console.log("new Message come in");
+          // console.log(user);
+          socket.to(user).emit("message received", newMessageReceived);
+        });
+      });
+    });
+  } catch (error) {
+    console.log(`${error} did not connect`);
+    process.exit(1);
+  }
+})();
