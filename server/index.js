@@ -64,6 +64,7 @@ const DB = process.env.MONGO_URL.replace(
   "<PASSWORD>",
   process.env.DATABASE_PASSWORD
 );
+
 console.log(DB);
 (async () => {
   try {

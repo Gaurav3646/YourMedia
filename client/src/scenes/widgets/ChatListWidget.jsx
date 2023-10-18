@@ -29,7 +29,7 @@ const ChatListWidget = ({ userId, socket }) => {
 
   const getChats = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/chats`, {
+      const response = await fetch(`https://social-5zzn.onrender.com/chats`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -56,7 +56,7 @@ const ChatListWidget = ({ userId, socket }) => {
     // console.log(userId);
 
     try {
-      const response = await fetch(`http://localhost:3001/chats`, {
+      const response = await fetch(`https://social-5zzn.onrender.com/chats`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -95,7 +95,7 @@ const ChatListWidget = ({ userId, socket }) => {
       // };
 
       const response = await fetch(
-        `http://localhost:3001/users?search=${searchValue}`,
+        `https://social-5zzn.onrender.com/users?search=${searchValue}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },

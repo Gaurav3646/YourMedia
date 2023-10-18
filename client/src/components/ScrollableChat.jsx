@@ -46,7 +46,7 @@ const ScrollableChat = ({ socket }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/messages/${selectedChat._id}`,
+        `https://social-5zzn.onrender.com/messages/${selectedChat._id}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },

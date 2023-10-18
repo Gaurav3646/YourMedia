@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import { initializeSocket } from "state";
 // "https://talk-a-tive.herokuapp.com"; -> After deployment
 import io from "socket.io-client";
-const ENDPOINT = "http://localhost:3001"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
+const ENDPOINT = "https://social-5zzn.onrender.com/"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
 var socket = null;
 
 // const ENDPOINT = "http://localhost:3001";

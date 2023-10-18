@@ -58,17 +58,20 @@ const SingleChat = ({ socket, istyping }) => {
       try {
         // const config = {};
 
-        const response = await fetch("http://localhost:3001/messages", {
-          method: "POST",
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            content: newMessage,
-            chatId: selectedChat._id,
-          }),
-        });
+        const response = await fetch(
+          "https://social-5zzn.onrender.com/messages",
+          {
+            method: "POST",
+            headers: {
+              "Content-type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              content: newMessage,
+              chatId: selectedChat._id,
+            }),
+          }
+        );
 
         const data = await response.json();
         // setMessages();
