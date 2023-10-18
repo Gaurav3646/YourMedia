@@ -177,9 +177,9 @@ const ChatListWidget = ({ userId, socket }) => {
               }`}
               chat={chat}
               onClick={(chat) => {
-                // if (selectedChat) {
-                socket.emit("leave chat", selectedChat._id);
-                // }
+                if (selectedChat) {
+                  socket.emit("leave chat", selectedChat?._id);
+                }
 
                 dispatch(setSelectedChat({ selectedChat: chat }));
                 dispatch(setChatSeen({ chatId: chat._id }));

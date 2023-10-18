@@ -27,10 +27,12 @@ const ChatBox = ({ socket, istyping, isOnline }) => {
           mb: "0.2rem",
         }}
       >
-        <UserImage
-          image={getSender(user, selectedChat?.users).picturePath}
-          size="50px"
-        />
+        {selectedChat && (
+          <UserImage
+            image={getSender(user, selectedChat?.users).picturePath}
+            size="50px"
+          />
+        )}
         <Typography color={palette.neutral.dark} variant="h5" fontWeight="500">
           {selectedChat &&
             `${getSender(user, selectedChat?.users).firstName} ${
