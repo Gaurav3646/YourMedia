@@ -10,7 +10,7 @@ const LoginPage = () => {
         width="100%"
         backgroundColor={theme.palette.background.alt}
         p="1rem 6%"
-        textAlign="center"
+        // textAlign="center"
       >
         <Typography fontWeight="bold" fontSize="32px" color="primary">
           YourMedia
@@ -18,14 +18,15 @@ const LoginPage = () => {
       </Box>
 
       <Box
-        width={isNonMobileScreens ? "50%" : "93%"}
+        width={isNonMobileScreens ? "45%" : "93%"}
         p="2rem"
         m="2rem auto"
         borderRadius="1.5rem"
         backgroundColor={theme.palette.background.alt}
+        textAlign="center"
       >
         <Typography fontWeight="500" variant="h5" sx={{ mb: "1.5rem" }}>
-          Welcome to YourMedia, the Social Media for YourMedia!
+          Welcome to YourMedia
         </Typography>
         <Form />
       </Box>
