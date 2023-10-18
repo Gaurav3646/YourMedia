@@ -100,7 +100,7 @@ const ChatPage = () => {
           flexBasis={isNonMobileScreens ? "26%" : undefined}
           mt={isNonMobileScreens ? undefined : "2rem"}
         >
-          {<ChatListWidget userId={_id} />}
+          {<ChatListWidget userId={_id} socket={socket} />}
         </Box>
       </Box>
     </Box>

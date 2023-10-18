@@ -3,7 +3,7 @@ import ChatFriend from "components/ChatFriend";
 import WidgetWrapper from "components/WidgetWrapper";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setChats, setSelectedChat } from "state";
+import { setChatSeen, setChatUnseen, setChats, setSelectedChat } from "state";
 import { InputBase } from "@mui/material";
 import { IconButton } from "@mui/material";
 import { Search } from "@mui/icons-material";
@@ -11,7 +11,7 @@ import FlexBetween from "components/FlexBetween";
 import UserImage from "components/UserImage";
 import { getSender } from "Config/ChatLogics";
 
-const ChatListWidget = ({ userId }) => {
+const ChatListWidget = ({ userId, socket }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const neutralLight = palette.neutral.light;
@@ -22,7 +22,7 @@ const ChatListWidget = ({ userId }) => {
   const user = useSelector((state) => state.user);
   // const [loggedUser, setLoggedUser] = useState();
   const token = useSelector((state) => state.token);
-  const chats = useSelector((state) => state.chats);
+  const chats = Object.values(useSelector((state) => state.chats));
   const selectedChat = useSelector((state) => state.selectedChat);
   const [fetchAgain, setFetchAgain] = useState(false);
   // const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
@@ -66,7 +66,8 @@ const ChatListWidget = ({ userId }) => {
       });
       const data = await response.json();
       // console.log("access", data);
-      dispatch(setSelectedChat(() => ({ selectedChat: data })));
+      dispatch(setChatUnseen({ chatId: data._id }));
+      dispatch(setSelectedChat({ selectedChat: data }));
       if (!chats.find((c) => c._id === selectedChat._id))
         dispatch(setChats({ chats: [selectedChat, ...chats] }));
 
@@ -176,17 +177,23 @@ const ChatListWidget = ({ userId }) => {
               }`}
               chat={chat}
               onClick={(chat) => {
-                console.log(chat);
+                // if (selectedChat) {
+                socket.emit("leave chat", selectedChat._id);
+                // }
+
                 dispatch(setSelectedChat({ selectedChat: chat }));
+                dispatch(setChatSeen({ chatId: chat._id }));
               }}
               subtitle={
-                chat.latestMessage
-                  ? chat.latestMessage.content.length > 50
-                    ? chat.latestMessage.content.substring(0, 51) + "..."
-                    : chat.latestMessage.content
-                  : ""
+                chat.seen
+                  ? chat.latestMessage
+                    ? chat.latestMessage.content.length > 50
+                      ? chat.latestMessage.content.substring(0, 51) + "..."
+                      : chat.latestMessage.content
+                    : ""
+                  : "New Messages"
               }
-              userPicturePath={chat.users[1].picturePath}
+              userPicturePath={getSender(user, chat.users).picturePath}
             />
           ))}
       </Box>

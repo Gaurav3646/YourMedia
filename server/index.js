@@ -103,6 +103,10 @@ console.log(DB);
         socket.join(room);
         console.log("User Joined Room: " + room);
       });
+      socket.on("leave chat", (room) => {
+        socket.leave(room);
+        console.log("User Left Room: " + room);
+      });
 
       socket.on("online", (id) => {
         if (!online.includes(id)) {

@@ -46,11 +46,11 @@ export const authSlice = createSlice({
       state.posts = updatedPosts;
     },
     setSelectedChat: (state, action) => {
-      state.selectedChat = action.payload.selectedChat;
+      state.selectedChat = { ...action.payload.selectedChat };
     },
     setNotification: (state, action) => {},
     setChats: (state, action) => {
-      state.chats = action.payload.chats;
+      state.chats = [...action.payload.chats];
     },
     setMessage: (state, action) => {
       state.messages = [action.messages, ...state.payload.messages];
@@ -63,6 +63,34 @@ export const authSlice = createSlice({
     //   state.socket = { ...action.payload.socket };
     //   console.log("Ho gaya connect-2");
     // },
+    // Action to mark a chat as "seen"
+    setChatSeen: (state, action) => {
+      const chatIdToMarkAsSeen = action.payload.chatId;
+      state.chats = state.chats.map((chat) => {
+        if (chat._id === chatIdToMarkAsSeen) {
+          return {
+            ...chat,
+            seen: true,
+          };
+        }
+        return chat;
+      });
+      console.log("hello");
+    },
+
+    // Action to mark a chat as "unseen"
+    setChatUnseen: (state, action) => {
+      const chatIdToMarkAsUnseen = action.payload.chatId;
+      state.chats = state.chats.map((chat) => {
+        if (chat._id === chatIdToMarkAsUnseen) {
+          return {
+            ...chat,
+            seen: false,
+          };
+        }
+        return chat;
+      });
+    },
   },
 });
 
@@ -78,6 +106,8 @@ export const {
   setNotification,
   setMessages,
   setChats,
+  setChatSeen,
+  setChatUnseen,
   // initializeSocket,
 } = authSlice.actions;
 export default authSlice.reducer;

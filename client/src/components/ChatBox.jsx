@@ -6,6 +6,8 @@ import { useTheme } from "@mui/material";
 import ScrollableChat from "./ScrollableChat";
 import { useDispatch, useSelector } from "react-redux";
 import { getSender } from "Config/ChatLogics";
+import UserImage from "./UserImage";
+import FlexBetween from "./FlexBetween";
 // import SingleChat from './SingleChat';
 // import { ChatState } from '../Context/ChatProvider';
 
@@ -17,24 +19,32 @@ const ChatBox = ({ socket, istyping, isOnline }) => {
   const { palette } = useTheme();
   return (
     <WidgetWrapper height="60vh">
-      <Typography
-        color={palette.neutral.dark}
-        variant="h5"
-        fontWeight="500"
-        sx={{ mb: "1.2rem" }}
+      <FlexBetween
+        gap="1rem"
+        sx={{
+          justifyContent: "flex-start",
+          alignItems: "flex-center",
+          mb: "0.2rem",
+        }}
       >
-        {selectedChat &&
-          `${getSender(user, selectedChat?.users).firstName} ${
-            getSender(user, selectedChat?.users).lastName
-          }`}
-        {!selectedChat && "Please select user"}
-        {selectedChat &&
-          (istyping
-            ? " is typing...."
-            : isOnline.includes(getSender(user, selectedChat?.users)._id)
-            ? " is online"
-            : " is offline")}
-      </Typography>
+        <UserImage
+          image={getSender(user, selectedChat?.users).picturePath}
+          size="50px"
+        />
+        <Typography color={palette.neutral.dark} variant="h5" fontWeight="500">
+          {selectedChat &&
+            `${getSender(user, selectedChat?.users).firstName} ${
+              getSender(user, selectedChat?.users).lastName
+            }`}
+          {!selectedChat && "Please select user"}
+          {selectedChat &&
+            (istyping
+              ? " is typing...."
+              : isOnline.includes(getSender(user, selectedChat?.users)._id)
+              ? " is online"
+              : " is offline")}
+        </Typography>
+      </FlexBetween>
 
       <Box
         sx={{
@@ -46,7 +56,7 @@ const ChatBox = ({ socket, istyping, isOnline }) => {
 
           backgroundColor: palette.neutral.light,
           width: "100%",
-          height: "88%",
+          height: "90%",
           borderRadius: "lg",
           overflowY: "auto",
 

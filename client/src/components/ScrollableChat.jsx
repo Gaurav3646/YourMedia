@@ -8,14 +8,19 @@ import {
   isSameUser,
 } from "../Config/ChatLogics.jsx";
 import { useDispatch, useSelector } from "react-redux";
-import { setMessage, setMessages } from "state/index.js";
+import {
+  setChatSeen,
+  setChatUnseen,
+  setMessage,
+  setMessages,
+} from "state/index.js";
 import { socket } from "scenes/ChatPage/index.jsx";
 // import io from "socket.io-client";
 // const ENDPOINT = "http://localhost:3001";
 // "https://talk-a-tive.herokuapp.com"; -> After deployment
 // var socket, selectedChatCompare;
 // import { selectedChatCompare } from "./SingleChat.jsx";
-
+var selectedChatCompare = null;
 const ScrollableChat = ({ socket }) => {
   // console.log(props);
   // const socket = props.socket;
@@ -29,10 +34,12 @@ const ScrollableChat = ({ socket }) => {
   // const [newMessage, setNewMessage] = useState("");
   // const [socketConnected, setSocketConnected] = useState(false);
   const selectedChat = useSelector((state) => state.selectedChat);
+
   // console.log(selectedChat);
   // const [typing, setTyping] = useState(false);
   // const [istyping, setIsTyping] = useState(false);
   const dispatch = useDispatch();
+  console.log(selectedChat, "selected");
   // console.log(selectedChat, "Hello");
   const fetchMessages = async () => {
     if (!selectedChat) return;
@@ -47,7 +54,7 @@ const ScrollableChat = ({ socket }) => {
       );
       const data = await response.json();
       console.log(data);
-      dispatch(setMessages({ messages: data || [] }));
+      dispatch(setMessages({ messages: [...data] }));
       // setLoading(false);
 
       socket.emit("join chat", selectedChat._id);
@@ -58,31 +65,34 @@ const ScrollableChat = ({ socket }) => {
   useEffect(() => {
     fetchMessages();
     // eslint-disable-next-line
-    // selectedChatCompare = selectedChat;
+    selectedChatCompare = selectedChat;
   }, [selectedChat]);
 
   // console.log(socket);
   useEffect(() => {
     // console.log("message aaya hai");
     socket.on("message received", (newMessageRecieved) => {
+      // console.log(selectedChat._id, newMessageRecieved.chat._id);
       if (
-        !selectedChat || // if chat is not selected or doesn't match current chat
-        selectedChat._id !== newMessageRecieved.chat._id
+        selectedChatCompare &&
+        selectedChatCompare._id === newMessageRecieved.chat._id
       ) {
         // if (!notification.includes(newMessageRecieved)) {
         //   setNotification([newMessageRecieved, ...notification]);
         //   setFetchAgain(!fetchAgain);
-        // }
-      } else {
         console.log("message aaya hai");
         // if (user._id === newMessageRecieved.sender._id) return;
-        dispatch(setMessages({ messages: [...messages, newMessageRecieved] }));
-        // setMessages();
+        console.log(messages);
+        return dispatch(
+          setMessages({ messages: [...messages, newMessageRecieved] })
+        );
+        // }
       }
+      return dispatch(setChatUnseen({ chatId: newMessageRecieved.chat._id }));
     });
   });
 
-  // console.log(messages, "message");
+  console.log(messages, "message");
   return (
     <ScrollableFeed>
       {messages &&

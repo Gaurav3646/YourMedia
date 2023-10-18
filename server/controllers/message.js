@@ -11,7 +11,7 @@ export const allMessages = async (req, res) => {
     const messages = await Message.find({ chat: req.params.chatId })
       .populate("sender", "firstName lastName picturePath email")
       .populate("chat");
-
+    await Chat.findByIdAndUpdate(req.params.chatId, { seen: true });
     res.json(messages);
   } catch (error) {
     res.status(400).json(error.message);
@@ -48,7 +48,10 @@ export const sendMessage = async (req, res) => {
       .exec();
 
     // Update the latest message in the chat
-    await Chat.findByIdAndUpdate(chatId, { latestMessage: populatedMessage });
+    await Chat.findByIdAndUpdate(chatId, {
+      latestMessage: populatedMessage,
+      seen: false,
+    });
 
     res.json(populatedMessage);
   } catch (error) {
