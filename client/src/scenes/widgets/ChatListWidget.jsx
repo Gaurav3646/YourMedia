@@ -141,7 +141,7 @@ const ChatListWidget = ({ userId, socket }) => {
           searchResult?.map((user) => (
             <FlexBetween key={user._id}>
               <FlexBetween gap="1rem">
-                <UserImage image={user.picturePath} size="55px" />
+                <UserImage image={user?.picturePath} size="55px" />
                 <Box
                   onClick={async () => {
                     await accessChat(user._id);
@@ -160,7 +160,7 @@ const ChatListWidget = ({ userId, socket }) => {
                       },
                     }}
                   >
-                    {`${user.firstName} ${user?.lastName}`}
+                    {`${user?.firstName} ${user?.lastName}`}
                   </Typography>
                 </Box>
               </FlexBetween>
