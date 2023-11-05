@@ -7,6 +7,7 @@ import FlexBetween from "./FlexBetween";
 import UserImage from "./UserImage";
 
 const ChatFriend = ({
+  key,
   friendId,
   name,
   subtitle,
@@ -21,7 +22,7 @@ const ChatFriend = ({
   const medium = palette.neutral.medium;
 
   return (
-    <FlexBetween>
+    <FlexBetween key={key}>
       <FlexBetween gap="1rem">
         <UserImage image={userPicturePath} size="55px" />
         <Box onClick={() => onClick(chat)}>

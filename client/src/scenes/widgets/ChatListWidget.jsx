@@ -69,7 +69,7 @@ const ChatListWidget = ({ userId, socket }) => {
       dispatch(setChatUnseen({ chatId: data._id }));
       dispatch(setSelectedChat({ selectedChat: data }));
       if (!chats.find((c) => c._id === selectedChat._id))
-        dispatch(setChats({ chats: [selectedChat, ...chats] }));
+        dispatch(setChats({ chats: [data, ...chats] }));
 
       // console.log(selectedChat);
       // console.log(data);
@@ -160,7 +160,7 @@ const ChatListWidget = ({ userId, socket }) => {
                       },
                     }}
                   >
-                    {`${user.firstName} ${user.lastName}`}
+                    {`${user.firstName} ${user?.lastName}`}
                   </Typography>
                 </Box>
               </FlexBetween>
@@ -172,8 +172,8 @@ const ChatListWidget = ({ userId, socket }) => {
             <ChatFriend
               key={chat._id}
               // name={getSender(user, chat.users)}
-              name={`${getSender(user, chat.users).firstName} ${
-                getSender(user, chat.users).lastName
+              name={`${getSender(user, chat.users)?.firstName} ${
+                getSender(user, chat.users)?.lastName
               }`}
               chat={chat}
               onClick={(chat) => {
@@ -182,7 +182,7 @@ const ChatListWidget = ({ userId, socket }) => {
                 }
 
                 dispatch(setSelectedChat({ selectedChat: chat }));
-                dispatch(setChatSeen({ chatId: chat._id }));
+                dispatch(setChatSeen({ chatId: chat?._id }));
               }}
               subtitle={
                 chat.seen
@@ -193,7 +193,7 @@ const ChatListWidget = ({ userId, socket }) => {
                     : ""
                   : "New Messages"
               }
-              userPicturePath={getSender(user, chat.users).picturePath}
+              userPicturePath={getSender(user, chat.users)?.picturePath}
             />
           ))}
       </Box>
